@@ -3,6 +3,11 @@ import psycopg2
 import os
 from dotenv import load_dotenv
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -28,26 +33,24 @@ def validar_licencia():
     nit = request.args.get("nit")
     clave = request.args.get("clave")
 
-    print(f"Parámetros recibidos: nit={nit}, clave={clave}")
-
-    if not nit or not clave:
-        return jsonify({"error": "Parámetros 'nit' y 'clave' son requeridos"}), 400
-
+    logging.info(f"Solicitud recibida para NIT: {nit}, Clave: {clave}")
+    
     try:
         conn = get_connection()
+        logging.info("Conexión a la base de datos establecida correctamente.")
+        
         cur = conn.cursor()
-        query = "SELECT 1 FROM licencias WHERE nit = %s AND clave_fabricacion = %s"
-        print("Ejecutando consulta:", query)
-        cur.execute(query, (nit, clave))
+        cur.execute("SELECT 1 FROM licencias WHERE nit = %s AND clave_fabricacion = %s", (nit, clave))
         result = cur.fetchone()
         cur.close()
         conn.close()
 
-        print("Resultado de la consulta:", result)
-
+        logging.info(f"Resultado de validación: {result}")
+        
         if result:
             return jsonify({"valido": True})
         return jsonify({"valido": False})
+        
     except Exception as e:
-        print("Error durante la validación:", str(e))
+        logging.error(f"Error al validar licencia: {str(e)}")
         return jsonify({"error": str(e)}), 500
