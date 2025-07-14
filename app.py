@@ -36,6 +36,7 @@ def validar_licencia():
     logging.info(f"Solicitud recibida para NIT: {nit}, Clave: {clave}")
     
     try:
+        print("Conectando a base de datos...")
         conn = get_connection()
         logging.info("Conexión a la base de datos establecida correctamente.")
         
@@ -54,3 +55,6 @@ def validar_licencia():
     except Exception as e:
         logging.error(f"Error al validar licencia: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=8080)
