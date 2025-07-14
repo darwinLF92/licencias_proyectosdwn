@@ -1,0 +1,6 @@
+CREATE TABLE licencias (
+    id SERIAL PRIMARY KEY,
+    nit VARCHAR(20) NOT NULL,
+    nombre_empresa VARCHAR(100),
+    clave_fabricacion VARCHAR(50) NOT NULL
+);
