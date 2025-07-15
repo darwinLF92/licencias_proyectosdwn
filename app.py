@@ -1,60 +1,90 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, request
 import psycopg2
-import os
 from dotenv import load_dotenv
-
-import logging
-
-logging.basicConfig(level=logging.INFO)
-
+import os
+import traceback
 
 load_dotenv()
-
+app = Flask(__name__)
 app = Flask(__name__)
 
-def get_connection():
+# Configuración desde .env
+DB_HOST = os.getenv("DB_HOST")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_PORT = os.getenv("DB_PORT")
+
+# Ruta de prueba
+@app.route("/")
+def home():
+    return "¡Servidor Flask corriendo correctamente!"
+
+# Ruta para obtener todas las licencias
+@app.route("/licencias")
+def obtener_licencias():
     try:
-        print("Obteniendo conexión a la base de datos...")
         conn = psycopg2.connect(
             host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT"),
             database=os.getenv("DB_NAME"),
             user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            port=os.getenv("DB_PORT")
+            password=os.getenv("DB_PASSWORD")
         )
-        print("Conexión exitosa.")
-        return conn
-    except Exception as e:
-        print("Error al conectar a la base de datos:", str(e))
-        raise
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, nombre_empresa, clave_fabricacion FROM licencias")
+        filas = cursor.fetchall()
 
-@app.route("/validar-licencia", methods=["GET"])
-def validar_licencia():
-    nit = request.args.get("nit")
-    clave = request.args.get("clave")
+        columnas = [desc[0] for desc in cursor.description]
+        resultados = [dict(zip(columnas, fila)) for fila in filas]
 
-    logging.info(f"Solicitud recibida para NIT: {nit}, Clave: {clave}")
-    
-    try:
-        print("Conectando a base de datos...")
-        conn = get_connection()
-        logging.info("Conexión a la base de datos establecida correctamente.")
-        
-        cur = conn.cursor()
-        cur.execute("SELECT 1 FROM licencias WHERE nit = %s AND clave_fabricacion = %s", (nit, clave))
-        result = cur.fetchone()
-        cur.close()
+        cursor.close()
         conn.close()
 
-        logging.info(f"Resultado de validación: {result}")
-        
-        if result:
-            return jsonify({"valido": True})
-        return jsonify({"valido": False})
-        
+        return jsonify(resultados)
+
     except Exception as e:
-        logging.error(f"Error al validar licencia: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        error_msg = traceback.format_exc()
+        print(error_msg)
+        return jsonify({"error": error_msg})
+    
+
+
+@app.route("/validar_licencia", methods=["POST"])
+def validar_licencia():
+    try:
+        data = request.get_json()
+        nit = data.get("nit")  # o "nit", como prefieras
+        clave = data.get("clave_fabricacion")
+
+        if not nit or not clave:
+            return jsonify({"valido": False, "error": "Faltan datos"}), 400
+
+        conn = psycopg2.connect(
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT"),
+            database=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD")
+        )
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id FROM licencias WHERE nit = %s AND clave_fabricacion = %s",
+            (nit, clave)
+        )
+        resultado = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if resultado:
+            return jsonify({"valido": True})
+        else:
+            return jsonify({"valido": False, "error": "Datos incorrectos"})
+
+    except Exception as e:
+        return jsonify({"valido": False, "error": str(e)})
+
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=8080)
