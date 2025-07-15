@@ -3,10 +3,11 @@ import psycopg2
 from dotenv import load_dotenv
 import os
 import traceback
+from flask_cors import CORS
 
 load_dotenv()
 app = Flask(__name__)
-app = Flask(__name__)
+CORS(app)  # Esto permite solicitudes desde cualquier origen
 
 # Configuración desde .env
 DB_HOST = os.getenv("DB_HOST")
