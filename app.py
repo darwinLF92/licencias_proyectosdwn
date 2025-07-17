@@ -16,13 +16,13 @@ print("✅ Flask app cargada correctamente")
 DB_HOST = os.getenv("DB_HOST")
 print("DB_HOST:", DB_HOST)
 DB_NAME = os.getenv("DB_NAME")
-print("DB_HOST:", DB_NAME)
+print("DB_NAME:", DB_NAME)
 DB_USER = os.getenv("DB_USER")
-print("DB_HOST:", DB_USER)
+print("DB_USER:", DB_USER)
 DB_PASSWORD = os.getenv("DB_PASSWORD")
-print("DB_HOST:", DB_PASSWORD)
+print("DB_PASSWORD:", DB_PASSWORD)
 DB_PORT = os.getenv("DB_PORT")
-print("DB_HOST:", DB_PORT)
+print("DB_PORT:", DB_PORT)
 
 
 # Ruta de prueba
@@ -94,6 +94,15 @@ def validar_licencia():
 
     except Exception as e:
         return jsonify({"valido": False, "error": str(e)})
+    
+@app.route("/health")
+def health():
+    return jsonify({
+        "db_host": DB_HOST,
+        "db_name": DB_NAME,
+        "db_port": DB_PORT
+    })
+
 
 
 if __name__ == "__main__":
