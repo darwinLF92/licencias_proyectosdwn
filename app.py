@@ -97,4 +97,5 @@ def validar_licencia():
 
 
 if __name__ == "__main__":
-    print("✅ App corriendo localmente")
+    port = int(os.environ.get("PORT", 8080))  # Railway define PORT
+    app.run(host="0.0.0.0", port=port)
