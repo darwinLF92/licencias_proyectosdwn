@@ -1,1 +1,10 @@
+# Archivos de entorno
 .env
+*.env
+
+# Entornos virtuales Python
+venv/
+.env*/        # por si hay .env_folder
+.venv/
+env/
+ENV/
