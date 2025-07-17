@@ -1,11 +1,16 @@
-FROM python:3.11-slim
+# Imagen base
+FROM python:3.10
 
+# Establecer el directorio de trabajo
 WORKDIR /app
 
+# Copiar dependencias y app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# Puerto a exponer
+EXPOSE 5000
 
-EXPOSE 8080
-
-CMD ["gunicorn", "wsgi:app", "--bind", "0.0.0.0:8080"]
+# Comando para ejecutar
+CMD ["python", "app.py"]
