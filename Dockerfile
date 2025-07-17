@@ -13,4 +13,4 @@ COPY . .
 EXPOSE 5000
 
 # Comando para ejecutar
-CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "app:app"]
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:$PORT"]

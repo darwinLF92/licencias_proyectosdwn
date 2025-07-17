@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 import os
-import psycopg2
+import psycopg2-binary
 from flask_cors import CORS
 
 app = Flask(__name__)
