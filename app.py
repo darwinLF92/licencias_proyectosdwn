@@ -9,6 +9,9 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)  # Esto permite solicitudes desde cualquier origen
 
+print("✅ Flask app cargada correctamente")
+
+
 # Configuración desde .env
 DB_HOST = os.getenv("DB_HOST")
 DB_NAME = os.getenv("DB_NAME")
