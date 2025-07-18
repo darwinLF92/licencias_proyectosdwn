@@ -1,1 +1,2 @@
-web: python manage.py collectstatic && gunicorn -c gunicorn.conf.py coffeeconnect.wsgi
+release: python manage.py collectstatic --noinput
+web: gunicorn proyecto.wsgi
