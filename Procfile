@@ -1,2 +1,1 @@
-release: python manage.py collectstatic --noinput
-web: gunicorn proyecto.wsgi
+web: python manage.py collectstatic && gunicorn -c gunicorn.conf.py django_api.wsgi
