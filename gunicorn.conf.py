@@ -1,44 +1,26 @@
 import os
 
-# Número de procesos worker. La fórmula general es (2 x NUM_CORES) + 1
-# Para Railway, con recursos limitados, 2-3 workers es apropiado
+# Número de procesos worker. Fórmula general: (2 x NUM_CORES) + 1
+# Railway: valores pequeños como 2 están bien
 workers = 2
 
-# Usar gevent como worker class para mejor manejo de conexiones asíncronas
-# Gevent es especialmente bueno para aplicaciones con muchas operaciones I/O
-worker_class = 'gevent'
-
-# Número máximo de conexiones simultáneas que cada worker puede manejar
-# 100 es un buen número para recursos limitados
-worker_connections = 100
+# Usar worker sync (por defecto en Gunicorn)
+worker_class = 'sync'
 
 # Tiempo máximo (en segundos) que un worker puede tomar para procesar una solicitud
-# Después de este tiempo, el worker será reiniciado
-timeout = 120  # 120 segundos para peticiones que pueden demorar
+timeout = 30  # más de esto puede hacer que Railway cierre la app
 
-# Tiempo (en segundos) que las conexiones keep-alive permanecerán abiertas
-# Un valor bajo ayuda a liberar recursos más rápidamente
+# Tiempo que las conexiones keep-alive permanecen abiertas
 keepalive = 2
 
-# Número de solicitudes que un worker procesará antes de reiniciarse
-# Ayuda a prevenir fugas de memoria
+# Reiniciar workers después de cierto número de solicitudes (por seguridad/memoria)
 max_requests = 1000
-
-# Añade variación aleatoria al reinicio de workers para evitar que todos
-# se reinicien al mismo tiempo
 max_requests_jitter = 50
 
-# Configuración adicional recomendada para Railway
+# Bind al puerto dinámico proporcionado por Railway
 bind = "0.0.0.0:" + os.environ.get("PORT", "8000")
-workers = 2
-worker_class = 'gevent'
-worker_connections = 100
-timeout = 30
-keepalive = 2
-max_requests = 1000
-max_requests_jitter = 50
 
-# Configuración de logs
+# Logs
 accesslog = "-"
 errorlog = "-"
 capture_output = True
