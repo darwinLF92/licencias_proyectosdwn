@@ -1,16 +1,13 @@
-"""
-WSGI config for django_api project.
-
-It exposes the WSGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
-"""
-
 import os
-
+import sys
+import traceback
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_api.settings')
 
-application = get_wsgi_application()
+try:
+    application = get_wsgi_application()
+except Exception as e:
+    print("Error al iniciar WSGI:", str(e), file=sys.stderr)
+    traceback.print_exc()
+    raise
