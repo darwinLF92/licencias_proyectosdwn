@@ -1,0 +1,1 @@
+web: python manage.py collectstatic && gunicorn -c gunicorn.conf.py coffeeconnect.wsgi
